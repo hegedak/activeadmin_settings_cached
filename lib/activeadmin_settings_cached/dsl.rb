@@ -38,17 +38,13 @@ module ActiveadminSettingsCached
           end
         end
 
-        flash[:success] = t('activeadmin_settings_cached.settings.update.success'.freeze)
+        if validation_errors.present?
+          flash[:error] = "Error(s) : #{validation_errors.join(', ')}"
+        else
+          flash[:success] = t('activeadmin_settings_cached.settings.update.success'.freeze)
+        end
         Rails.version.to_i >= 5 ? redirect_back(fallback_location: admin_root_path) : redirect_to(:back)
         options[:after_save].call if options[:after_save].respond_to?(:call)
-
-        if validation_errors.present?
-          flash_text = "Error(s) : #{validation_errors.join(', ')}"
-          render json: { flash: flash_text, status: 'failure' }
-        else
-          flash_text = 'Settings were successfully updated.'
-          render json: { flash: flash_text, status: 'success' }
-        end
       end
 
       instance_eval(&block) if block_given?
